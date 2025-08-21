@@ -7,7 +7,7 @@ const letters = ["V", "O", "X", "A"];
 export const LoadingState = () => {
   return (
     <div className="flex items-center justify-center h-screen bg-background">
-      <div className="flex space-x-2 text-4xl font-bold text-primary tracking-widest">
+      <div className="flex space-x-2 text-6xl font-bold text-primary tracking-widest">
         {letters.map((letter, i) => (
           <motion.span
             key={i}
@@ -24,6 +24,7 @@ export const LoadingState = () => {
           </motion.span>
         ))}
       </div>
+      
     </div>
   );
 };
