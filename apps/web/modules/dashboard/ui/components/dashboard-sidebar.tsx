@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 import { url } from "inspector";
 import {
   CreditCardIcon,
@@ -106,16 +107,20 @@ export const DashboardSidebar = () => {
             <SidebarMenu>
               {customerSupportItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive(item.url)}
+                      className={cn(
+                        isActive(item.url) &&
+                          "bg-gradient-to-b from-primary to-primary! text-sidebar-primary-foreground! hover:to-[primary]/90"
+                      )}
+                      tooltip={item.title}
+                    >
+                      <Link href={item.url}>
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -132,6 +137,10 @@ export const DashboardSidebar = () => {
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.url)}
+                    className={cn(
+                        isActive(item.url) &&
+                          "bg-gradient-to-b from-primary to-primary! text-sidebar-primary-foreground! hover:to-[primary]/90"
+                      )}
                     tooltip={item.title}
                   >
                     <Link href={item.url}>
@@ -155,6 +164,10 @@ export const DashboardSidebar = () => {
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.url)}
+                    className={cn(
+                        isActive(item.url) &&
+                          "bg-gradient-to-b from-primary to-primary! text-sidebar-primary-foreground! hover:to-[primary]/90"
+                      )}
                     tooltip={item.title}
                   >
                     <Link href={item.url}>
