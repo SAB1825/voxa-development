@@ -1,18 +1,27 @@
 "use client";
-import { WidgetFooter } from "../components/widget-footer";
-import { WidgetHeader } from "../components/widget-header";
+import { useAtomValue } from "jotai";
 import { WidgetAuthScreen } from "../screens/widget-auth-screen";
+import { screenAtom } from "@/modules/atoms/widge-atoms";
 
 interface WidgetViewProps {
   organizationId: string;
 }
 
 export const WidgetView = ({ organizationId }: WidgetViewProps) => {
+  const screen = useAtomValue(screenAtom);
+  const screenComponent ={
+    error: <p>TODO : ERROR</p>,
+    loading: <p>TODO : loading</p>,
+    auth: <WidgetAuthScreen />,
+    voice: <p>TODO : voice</p>,
+    inbox: <p>TODO : inbox</p>,
+    selection: <p>TODO : selection</p>,
+    chat: <p>TODO : chat</p>,
+    contact: <p>TODO : contact</p>,
+  }
   return (
     <main className="min-h-screen min-w-screen flex h-full w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-background shadow-lg">
-      
-      <WidgetAuthScreen />
-      {/* <WidgetFooter /> */}
+      {screenComponent[screen]}
     </main>
   );
 };

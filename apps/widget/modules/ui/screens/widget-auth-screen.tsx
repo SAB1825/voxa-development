@@ -15,6 +15,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../../../../packages/backend/convex/_generated/api";
 import { platform } from "os";
 import { Doc } from "../../../../../packages/backend/convex/_generated/dataModel";
+import { Loader } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -32,19 +33,18 @@ export const WidgetAuthScreen = () => {
   const orgId = "1234";
   const createContactSession = useMutation(api.public.contactSessions.create);
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    if(!orgId) return;
-    const metadata : Doc<"contactSession">["metadata"] ={
-      userAgent : navigator.userAgent,
-      language : navigator.language,
-      platform : navigator.platform,
-      timezone : Intl.DateTimeFormat().resolvedOptions().timeZone
+    if (!orgId) return;
+    const metadata: Doc<"contactSession">["metadata"] = {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      platform: navigator.platform,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
     const contactSessionId = await createContactSession({
       ...data,
-      organizationId : orgId,
-      metadata
-
-    })
+      organizationId: orgId,
+      metadata,
+    });
     console.log(contactSessionId);
   };
   return (
@@ -103,7 +103,11 @@ export const WidgetAuthScreen = () => {
             size="lg"
             type="submit"
           >
-            Continue
+            {form.formState.isLoading ? (
+              <Loader className="animate-spin" />
+            ) : (
+              "Continue"
+            )}
           </Button>
         </form>
       </Form>
