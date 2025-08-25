@@ -17,7 +17,7 @@ import { platform } from "os";
 import { Doc } from "../../../../../packages/backend/convex/_generated/dataModel";
 import { Loader } from "lucide-react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { contactSessionIdAtomFamily, organizationIdAtom } from "@/modules/atoms/widge-atoms";
+import { contactSessionIdAtomFamily, organizationIdAtom, screenAtom } from "@/modules/atoms/widge-atoms";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -25,6 +25,7 @@ const formSchema = z.object({
 });
 
 export const WidgetAuthScreen = () => {
+  const setScreen = useSetAtom(screenAtom)
   const organizationId = useAtomValue(organizationIdAtom);
   const setContactSessionId = useSetAtom(
     contactSessionIdAtomFamily(organizationId || "")
@@ -37,10 +38,10 @@ export const WidgetAuthScreen = () => {
       email: "",
     },
   });
-  const orgId = "1234";
+  
   const createContactSession = useMutation(api.public.contactSessions.create);
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    if (!orgId) return;
+    if (!organizationId) return;
     const metadata: Doc<"contactSession">["metadata"] = {
       userAgent: navigator.userAgent,
       language: navigator.language,
@@ -49,10 +50,11 @@ export const WidgetAuthScreen = () => {
     };
     const contactSessionId = await createContactSession({
       ...data,
-      organizationId: orgId,
+      organizationId,
       metadata,
     });
     setContactSessionId(contactSessionId);
+    setScreen("selection")
   };
   return (
     <>

@@ -29,6 +29,9 @@ import {
 import { AIResponse } from "@workspace/ui/components/ai/response";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { AIInput, AIInputSubmit, AIInputTextarea, AIInputToolbar, AIInputTools } from "@workspace/ui/components/ai/input";
+import { UseInfiniteScroll } from "@workspace/ui/hooks/use-inifite-scroll";
+import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
+import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 
 const formSchema = z.object({
   message: z.string().min(1, "Message is required"),
@@ -69,6 +72,12 @@ export const WidgetChatScreen = () => {
     }
   );
 
+  const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } = UseInfiniteScroll({
+    status : messages.status,
+    loadMore : messages.loadMore,
+    loadSize : 10,
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -107,6 +116,12 @@ export const WidgetChatScreen = () => {
       </WidgetHeader>
       <AIConversation>
         <AIConversationContent>
+          <InfiniteScrollTrigger
+            canLoadMore={canLoadMore}
+            isLoadingMore={isLoadingMore}
+            onLoadMore={handleLoadMore}
+            ref={topElementRef}
+          />
           {toUIMessages(messages.results ?? [])?.map((message) => {
             return (
               <AIMessage
@@ -117,6 +132,13 @@ export const WidgetChatScreen = () => {
                 <AIMessageContent >
                   <AIResponse>{message.content}</AIResponse>
                 </AIMessageContent>
+                {message.role === "assistant" && (
+                  <DicebearAvatar 
+                    imageUrl="/logo.png"
+                    seed="assistant"
+                    size={32} 
+                  />
+                )}
               </AIMessage>
             );
           })}

@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@convex-dev/agent": "^0.1.16",
     "@hookform/resolvers": "^5.2.1",
     "@vapi-ai/web": "^2.3.8",
     "@workspace/backend": "workspace:*",
@@ -24,7 +25,6 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.62.0",
-    "@convex-dev/agent": "^0.1.16",
     "zod": "3.25.67"
   },
   "devDependencies": {
