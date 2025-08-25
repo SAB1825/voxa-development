@@ -1,9 +1,12 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
+import { SupportAgent } from "../system/ai/agent/supportAgent";
+import { saveMessage } from "@convex-dev/agent";
+import { components } from "../_generated/api";
 
 export const getOne = query({
   args: {
-    conversationId  : v.id("conversation"),
+    conversationId  : v.id("conversations"),
     contactSessionId: v.id("contactSession"),
   },
   handler: async (ctx, args) => {
@@ -16,7 +19,16 @@ export const getOne = query({
     }
     const conversation = await ctx.db.get(args.conversationId);
     if (!conversation) {
-      throw null;
+      throw new ConvexError({
+        code : "NOT_FOUND",
+        message: "Conversation not found",
+      });
+    }
+    if(conversation.contactSessionId !== session._id) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to access this conversation",
+      });
     }
     return {
         _id : conversation._id,
@@ -40,8 +52,20 @@ export const create = mutation({
         message: "Invalid session",
       });
     }
-    const threadId = "123"
-    const conversationId = await ctx.db.insert("conversation", {
+
+    const { threadId } = await SupportAgent.createThread(ctx, {
+      userId: args.organizationId
+    });
+
+    await saveMessage(ctx, components.agent, {
+      threadId,
+      message : {
+        role : "assistant",
+        content : "Hello, how can i help you today?"
+      }
+    })
+
+    const conversationId = await ctx.db.insert("conversations", {
         contactSessionId : session._id,
         status : "unresolved",
         organizationId : args.organizationId,
