@@ -10,7 +10,7 @@ import {
 import { useAtomValue, useSetAtom } from "jotai";
 import React from "react";
 import { WidgetHeader } from "../components/widget-header";
-import { AlertTriangleIcon, ArrowLeft, Menu, MenuIcon } from "lucide-react";
+import { AlertTriangleIcon, ArrowLeft, ChartGanttIcon, Menu, MenuIcon, MessageCircle } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../../../../packages/backend/convex/_generated/api";
@@ -107,7 +107,8 @@ export const WidgetChatScreen = () => {
             <Button size="icon" variant="transparent" onClick={onBack}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-lg font-medium">Chat</h1>
+            <MessageCircle />
+            <h1 className="text-2xl font-semibold">Chat</h1>
           </div>
           <Button size="icon" variant="transparent">
             <Menu className="w-5 h-5" />

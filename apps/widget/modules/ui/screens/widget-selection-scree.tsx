@@ -14,6 +14,7 @@ import {
 } from "@/modules/atoms/widge-atoms";
 import { useMutation } from "convex/react";
 import { api } from "../../../../../packages/backend/convex/_generated/api";
+import { WidgetFooter } from "../components/widget-footer";
 
 export const WidgetSelectionScreen = () => {
   const [isPending, setIsPending] = useState(false);
@@ -83,6 +84,7 @@ export const WidgetSelectionScreen = () => {
           <ChevronLeft />
         </Button>
       </div>
+      <WidgetFooter />
     </>
   );
 };

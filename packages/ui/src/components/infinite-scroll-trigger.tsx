@@ -18,7 +18,7 @@ export const InfiniteScrollTrigger = ({
     isLoadingMore,
     onLoadMore,
     loadMoreText = "Load More",
-    noMoreText = "Start of the Chat",
+    noMoreText = "No more items",
     className,
     ref
 }: InfiniteScrollTriggerProps) => {
