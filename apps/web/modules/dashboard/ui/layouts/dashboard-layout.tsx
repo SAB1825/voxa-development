@@ -4,6 +4,7 @@ import React from "react";
 import { cookies } from "next/headers";
 import { SidebarProvider } from "@workspace/ui/components/sidebar";
 import { DashboardSidebar } from "../components/dashboard-sidebar";
+import { Provider } from "jotai";
 export const DashboardLayout = async ({
   children,
 }: {
@@ -14,12 +15,12 @@ export const DashboardLayout = async ({
   return (
     <AuthGuard>
       <OrganizationGuard>
-        <SidebarProvider
-            defaultOpen={defaultOpen}
-        >
-          <DashboardSidebar />
-          <main className="flex flex-1 flex-col">{children}</main>
-        </SidebarProvider>
+        <Provider>
+          <SidebarProvider defaultOpen={defaultOpen}>
+            <DashboardSidebar />
+            <main className="flex flex-1 flex-col">{children}</main>
+          </SidebarProvider>
+        </Provider>
       </OrganizationGuard>
     </AuthGuard>
   );
