@@ -4,6 +4,46 @@ import { components, internal } from "../_generated/api";
 import { SupportAgent } from "../system/ai/agent/supportAgent";
 import { paginationOptsValidator } from "convex/server";
 import { saveMessage } from "@convex-dev/agent";
+import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
+
+export const enhanceResponse = action({
+  args: {
+    prompt: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "User is not authenticated",
+      });
+    }
+
+    const orgId = identity.orgId as string;
+    if (!orgId) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "User is not part of an organization",
+      });
+    }
+    const response = await generateText({
+      model: google("gemini-1.5-flash"),
+      messages: [
+        {
+          role: "system",
+          content:
+            "Enhance the operator's response to be more empathetic, professional, clear and helpful while maintaining their intent and key information.",
+        },{
+          role : "user",
+          content : args.prompt
+        }
+      ],
+    });
+
+    return response.text
+  },
+});
 
 export const create = mutation({
   args: {
@@ -40,22 +80,22 @@ export const create = mutation({
         message: "Conversation is already resolved",
       });
     }
-    if(conversation.organizationId !== orgId) {
+    if (conversation.organizationId !== orgId) {
       throw new ConvexError({
-        code : "NOT_FOUND",
-        message : "Conversation not found"
-      })
+        code: "NOT_FOUND",
+        message: "Conversation not found",
+      });
     }
     //TODO : CHECK SUBSCRIPTION
 
     await saveMessage(ctx, components.agent, {
-      threadId : conversation.threadId,
-      agentName : identity.familyName,
-      message : {
-        role : "assistant",
-        content : args.prompt
-      }
-    })
+      threadId: conversation.threadId,
+      agentName: identity.familyName,
+      message: {
+        role: "assistant",
+        content: args.prompt,
+      },
+    });
   },
 });
 
@@ -86,18 +126,18 @@ export const getMany = query({
       .withIndex("by_thread_id", (q) => q.eq("threadId", args.threadId))
       .unique();
 
-    if(!conversation){
+    if (!conversation) {
       throw new ConvexError({
         code: "NOT_FOUND",
         message: "Conversation not found",
       });
     }
 
-    if(conversation.organizationId !== orgId) {
+    if (conversation.organizationId !== orgId) {
       throw new ConvexError({
-        code : "NOT_FOUND",
-        message : "Conversation not found"
-      })
+        code: "NOT_FOUND",
+        message: "Conversation not found",
+      });
     }
 
     const paginated = await SupportAgent.listMessages(ctx, {
