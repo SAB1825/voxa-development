@@ -34,14 +34,15 @@ export const enhanceResponse = action({
           role: "system",
           content:
             "Enhance the operator's response to be more empathetic, professional, clear and helpful while maintaining their intent and key information.",
-        },{
-          role : "user",
-          content : args.prompt
-        }
+        },
+        {
+          role: "user",
+          content: args.prompt,
+        },
       ],
     });
 
-    return response.text
+    return response.text;
   },
 });
 
@@ -79,6 +80,11 @@ export const create = mutation({
         code: "BAD_REQUEST",
         message: "Conversation is already resolved",
       });
+    }
+    if (conversation.status === "unresolved") {
+      await ctx.db.patch(args.conversationId, 
+        { status: "escalated" }
+      );
     }
     if (conversation.organizationId !== orgId) {
       throw new ConvexError({
