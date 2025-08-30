@@ -7,9 +7,9 @@ import { file } from "zod/v4";
 import { extractText } from "@convex-dev/agent";
 import { ar } from "zod/v4/locales";
 const AI_MODELS = {
-  image: google.chat("gemini-1.5-flash"),
-  pdf: google.chat("gemini-1.5-flash"),
-  html: google.chat("gemini-1.5-flash"),
+  image: google.chat("gemini-2.5-flash"),
+  pdf: google.chat("gemini-2.5-flash"),
+  html: google.chat("gemini-2.5-flash"),
 } as const;
 
 const SUPPORTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif"];
