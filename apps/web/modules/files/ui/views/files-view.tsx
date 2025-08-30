@@ -28,6 +28,8 @@ import {
 import { useState } from "react";
 import { UploadDialog } from "../components/upload-dialog";
 import { set } from "date-fns";
+import { DeleteFileDialog } from "../components/delete-file-dialog";
+import type { PublicFile } from "@workspace/backend/private/files";
 
 export const FilesView = () => {
   const files = usePaginatedQuery(
@@ -48,10 +50,26 @@ export const FilesView = () => {
     loadMore: files.loadMore,
     loadSize: 10,
   });
-
+  const [selectedFile, setSelectedFile] = useState<PublicFile | null>(null);
+  
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const handleDeleteClick = (file: PublicFile) => {
+    setSelectedFile(file);
+    setDeleteDialogOpen(true);
+  };
+  const handleFileDeleted = () => {
+    setSelectedFile(null);
+    setDeleteDialogOpen(false);
+  }
   return (
     <>
+    <DeleteFileDialog 
+      onOpenChange={setDeleteDialogOpen}
+      open={deleteDialogOpen}
+      file={selectedFile}
+      onDeleted={handleFileDeleted}
+    />
     <UploadDialog 
         onOpenChange={setUploadDialogOpen}
         open={uploadDialogOpen}
@@ -84,16 +102,20 @@ export const FilesView = () => {
               {(() => {
                 if (isLoadingFirstPage) {
                   return (
-                    <TableCell className="h-24 text-ceter" colSpan={4}>
-                      Loading files...
-                    </TableCell>
+                    <TableRow>
+                      <TableCell className="h-24 text-center" colSpan={4}>
+                        Loading files...
+                      </TableCell>
+                    </TableRow>
                   );
                 }
                 if (files.results.length === 0) {
                   return (
-                    <TableCell className="h-24 text-center" colSpan={4}>
-                      No files found.
-                    </TableCell>
+                    <TableRow>
+                      <TableCell className="h-24 text-center" colSpan={4}>
+                        No files found.
+                      </TableCell>
+                    </TableRow>
                   );
                 }
 
@@ -125,7 +147,7 @@ export const FilesView = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => {}}>
+                          <DropdownMenuItem onClick={() => handleDeleteClick(file)}>
                             <TrashIcon className="mr-2 size-4" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>

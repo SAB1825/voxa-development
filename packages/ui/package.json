@@ -7,6 +7,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.2.22",
     "@dicebear/collection": "^9.2.4",
     "@dicebear/core": "^9.2.4",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -36,6 +37,7 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
+    "ai": "4.3.19",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
