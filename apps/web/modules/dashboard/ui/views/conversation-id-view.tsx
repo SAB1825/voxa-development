@@ -58,7 +58,8 @@ export const ConversationIdView = ({
     conversation?.threadId ? { threadId: conversation.threadId } : "skip",
     { initialNumItems: 10 }
   );
-
+const uiMessages = toUIMessages(messages.results ?? []);
+console.log('First message keys:', Object.keys(uiMessages[0] || {}));
   const {
     topElementRef,
     handleLoadMore,
