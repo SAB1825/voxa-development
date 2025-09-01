@@ -166,7 +166,7 @@ console.log('First message keys:', Object.keys(uiMessages[0] || {}));
               key={message.id}
             >
               <AIMessageContent>
-                <AIResponse>{message.content}</AIResponse>
+                <AIResponse>{(message as any).content}</AIResponse>
               </AIMessageContent>
               {message.role === "user" && (
                 <DicebearAvatar
