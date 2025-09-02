@@ -3,14 +3,16 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import React, { useState } from "react";
 import { WidgetHeader } from "../components/widget-header";
-import { ChevronLeft, Loader, MessageSquare, MessageSquareIcon } from "lucide-react";
+import { ChevronLeft, Loader, MessageSquare, MessageSquareIcon, MicIcon, PhoneIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   contactSessionIdAtomFamily,
   conversationIdAtom,
   errorMessageAtom,
+  hasVapiSecretsAtom,
   organizationIdAtom,
   screenAtom,
+  widgetSettingsAtom,
 } from "@/modules/atoms/widge-atoms";
 import { useMutation } from "convex/react";
 import { api } from "../../../../../packages/backend/convex/_generated/api";
@@ -22,6 +24,9 @@ export const WidgetSelectionScreen = () => {
   const setConversationId = useSetAtom(conversationIdAtom);
   const setErrorMessage = useSetAtom(errorMessageAtom);
   const organizationId = useAtomValue(organizationIdAtom);
+  const widgetSettings = useAtomValue(widgetSettingsAtom)
+  const hasVapiSecrets = useAtomValue(hasVapiSecretsAtom)
+
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
   );
@@ -83,6 +88,46 @@ export const WidgetSelectionScreen = () => {
           )}
           <ChevronLeft />
         </Button>
+          {hasVapiSecrets &&  widgetSettings?.vapiSettings.assistantId && (
+        <Button
+          className="h-16 w-full justify-between pointer-cursor"
+          variant="outline"
+          onClick={() => setScreen("voice")}
+          disabled={isPending}
+        >
+          {isPending ? (
+            <div className="flex items-center">
+              <Loader className="animate-spin" />
+            </div>
+          ) : (
+            <div className="flex items-center gap-x-2">
+              <MicIcon className="size-4" />
+              <span>Start Voice Call</span>
+            </div>
+          )}
+          <ChevronLeft />
+        </Button>
+          )}
+          {hasVapiSecrets &&  widgetSettings?.vapiSettings.phoneNumber && (
+        <Button
+          className="h-16 w-full justify-between pointer-cursor"
+          variant="outline"
+          onClick={() => setScreen("contact")}
+          disabled={isPending}
+        >
+          {isPending ? (
+            <div className="flex items-center">
+              <Loader className="animate-spin" />
+            </div>
+          ) : (
+            <div className="flex items-center gap-x-2">
+              <PhoneIcon className="size-4" />
+              <span>Call Us</span>
+            </div>
+          )}
+          <ChevronLeft />
+        </Button>
+          )}
       </div>
       <WidgetFooter />
     </>

@@ -10,6 +10,7 @@ import {
   loadingMessageAtom,
   organizationIdAtom,
   screenAtom,
+  vapiSecretAtom,
   widgetSettingsAtom,
 } from "@/modules/atoms/widge-atoms";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -31,6 +32,7 @@ export const WidgetLoadingScreen = ({
   const setLoadingMessage = useSetAtom(loadingMessageAtom);
   const setOrganizationId = useSetAtom(organizationIdAtom);
   const setWidgetSetting = useSetAtom(widgetSettingsAtom);
+  const setVapiSecretsAtom = useSetAtom(vapiSecretAtom)
 
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
@@ -132,9 +134,45 @@ export const WidgetLoadingScreen = ({
     setLoadingMessage("Loading widget settings...");
     if (widgetSettings !== undefined) {
       setWidgetSetting(widgetSettings);
-      setStep("done");
+      setStep("vapi");
     }
   }, [step, widgetSettings, setWidgetSetting, setLoadingMessage]);
+
+
+  //STEP : 4
+  const getVapiSecret = useAction(api.public.secrets.getVapiSecrets);
+  useEffect(() => {
+    if(step !== "vapi" ) {
+      return ;
+    }
+    if(!organizationId) {
+      setErrorMessage("Organization ID is required!");
+      setScreen("error");
+      return;
+    }
+    setLoadingMessage("Loading Voice Features...")
+    getVapiSecret({
+      organizationId: organizationId
+    })
+    .then((secrets) => {
+      setVapiSecretsAtom(secrets)
+      setStep("done")
+    })
+    .catch(() => {
+      setVapiSecretsAtom(null)
+      setStep("done")
+    })
+  },[
+    step,
+    organizationId,
+    getVapiSecret,
+    setVapiSecretsAtom,
+    setStep
+  ])
+
+
+
+
   useEffect(() => {
     if (step !== "done") {
       return;
