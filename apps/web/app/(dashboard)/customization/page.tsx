@@ -1,8 +1,9 @@
+import { CustomizationView } from '@/modules/customization/ui/views/customization-view'
 import React from 'react'
 
 const CustomizatonPage = () => {
   return (
-    <div>CustomizatonPage</div>
+    <CustomizationView />
   )
 }
 
