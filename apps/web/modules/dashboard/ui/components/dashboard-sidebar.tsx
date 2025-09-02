@@ -52,7 +52,7 @@ const configurationItems = [
   },
   {
     title: "Voice Assistant",
-    url: "plugins/vapi",
+    url: "/plugins/vapi",
     icon: Mic,
   },
 ];

@@ -29,30 +29,30 @@ export const getMany = query({
 
     const conversationWithLastMessage = await Promise.all(
       conversations.page.map(async (conversation) => {
-        let lastMessage : MessageDoc | null = null;
+        let lastMessage: MessageDoc | null = null;
         const messages = await SupportAgent.listMessages(ctx, {
-          threadId : conversation.threadId,
-          paginationOpts : { numItems : 1, cursor : null }
-        })
-        if(messages.page.length > 0) {
+          threadId: conversation.threadId,
+          paginationOpts: { numItems: 1, cursor: null },
+        });
+        if (messages.page.length > 0) {
           lastMessage = messages.page[0] ?? null;
         }
 
         return {
-          _id :conversation._id,
-          _creationTime : conversation._creationTime,
-          status : conversation.status,
-          organizationId : conversation.organizationId,
-          threadId : conversation.threadId,
-          lastMessage
-        }
+          _id: conversation._id,
+          _creationTime: conversation._creationTime,
+          status: conversation.status,
+          organizationId: conversation.organizationId,
+          threadId: conversation.threadId,
+          lastMessage,
+        };
       })
-    )
+    );
 
     return {
       ...conversations,
-      page : conversationWithLastMessage
-    }
+      page: conversationWithLastMessage,
+    };
   },
 });
 
@@ -104,6 +104,13 @@ export const create = mutation({
       });
     }
 
+    const widgetSettings = await ctx.db
+      .query("widgetSettings")
+      .withIndex("by_organization_id", (q) =>
+        q.eq("organizationId", args.organizationId)
+      )
+      .unique();
+
     const { threadId } = await SupportAgent.createThread(ctx, {
       userId: args.organizationId,
     });
@@ -112,7 +119,7 @@ export const create = mutation({
       threadId,
       message: {
         role: "assistant",
-        content: "Hello, how can i help you today?",
+        content: widgetSettings?.greetMessage || "Hello, how can i help you today?",
       },
     });
 

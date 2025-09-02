@@ -6,11 +6,23 @@ import {
   errorMessageAtom,
   organizationIdAtom,
   screenAtom,
+  widgetSettingsAtom,
 } from "@/modules/atoms/widge-atoms";
+import {
+  AISuggestion,
+  AISuggestions,
+} from "@workspace/ui/components/ai/suggestion";
 import { useAtomValue, useSetAtom } from "jotai";
-import React from "react";
+import React, { useMemo } from "react";
 import { WidgetHeader } from "../components/widget-header";
-import { AlertTriangleIcon, ArrowLeft, ChartGanttIcon, Menu, MenuIcon, MessageCircle } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  ArrowLeft,
+  ChartGanttIcon,
+  Menu,
+  MenuIcon,
+  MessageCircle,
+} from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../../../../packages/backend/convex/_generated/api";
@@ -28,7 +40,13 @@ import {
 } from "@workspace/ui/components/ai/message";
 import { AIResponse } from "@workspace/ui/components/ai/response";
 import { Form, FormField } from "@workspace/ui/components/form";
-import { AIInput, AIInputSubmit, AIInputTextarea, AIInputToolbar, AIInputTools } from "@workspace/ui/components/ai/input";
+import {
+  AIInput,
+  AIInputSubmit,
+  AIInputTextarea,
+  AIInputToolbar,
+  AIInputTools,
+} from "@workspace/ui/components/ai/input";
 import { UseInfiniteScroll } from "@workspace/ui/hooks/use-inifite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
@@ -41,6 +59,7 @@ export const WidgetChatScreen = () => {
   const setScreen = useSetAtom(screenAtom);
   const setConversationId = useSetAtom(conversationIdAtom);
   const conversationId = useAtomValue(conversationIdAtom);
+  const widgetSettings = useAtomValue(widgetSettingsAtom);
   const organizationId = useAtomValue(organizationIdAtom);
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
@@ -49,6 +68,18 @@ export const WidgetChatScreen = () => {
     setConversationId(null);
     setScreen("selection");
   };
+
+  const suggestion = useMemo(() => {
+    if (!widgetSettings) {
+      return [];
+    }
+    return Object.keys(widgetSettings.defaultSuggestions).map((key) => {
+      return widgetSettings.defaultSuggestions[
+        key as keyof typeof widgetSettings.defaultSuggestions
+      ];
+    });
+  }, [widgetSettings]);
+
   const conversation = useQuery(
     api.public.conversations.getOne,
     conversationId && contactSessionId
@@ -72,11 +103,12 @@ export const WidgetChatScreen = () => {
     }
   );
 
-  const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } = UseInfiniteScroll({
-    status : messages.status,
-    loadMore : messages.loadMore,
-    loadSize : 10,
-  })
+  const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } =
+    UseInfiniteScroll({
+      status: messages.status,
+      loadMore: messages.loadMore,
+      loadSize: 10,
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -128,16 +160,15 @@ export const WidgetChatScreen = () => {
               <AIMessage
                 from={message.role === "user" ? "user" : "assistant"}
                 key={message.id}
-               
               >
-                <AIMessageContent >
+                <AIMessageContent>
                   <AIResponse>{(message as any).content}</AIResponse>
                 </AIMessageContent>
                 {message.role === "assistant" && (
-                  <DicebearAvatar 
+                  <DicebearAvatar
                     imageUrl="/logo.png"
                     seed="assistant"
-                    size={32} 
+                    size={32}
                   />
                 )}
               </AIMessage>
@@ -145,12 +176,35 @@ export const WidgetChatScreen = () => {
           })}
         </AIConversationContent>
       </AIConversation>
+     <AISuggestions
+      
+     className="flex w-full flex-col items-end p-2">
+          {suggestion.map((suggestion) => {
+            if(!suggestion) {
+              return null;
+            }
+            return (
+              <AISuggestion 
+                key={suggestion}
+                disabled={conversation?.status === "resolved" || form.formState.isSubmitting}
+                onClick={() => {
+                  form.setValue("message", suggestion, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  });
+                  form.handleSubmit(onSubmit)();
+                }}
+                suggestion={suggestion}
+              />
+            )
+          })}
+     </AISuggestions>
 
       <Form {...form}>
         <AIInput
           className="rounded border-x-2 border-b-0"
           onSubmit={form.handleSubmit(onSubmit)}
-          
         >
           <FormField
             control={form.control}
@@ -179,7 +233,9 @@ export const WidgetChatScreen = () => {
           <AIInputToolbar>
             <AIInputTools />
             <AIInputSubmit
-              disabled={conversation?.status === "resolved" || !form.formState.isValid}
+              disabled={
+                conversation?.status === "resolved" || !form.formState.isValid
+              }
               status="ready"
               type="submit"
             />

@@ -5,19 +5,23 @@ import React, { useEffect, useState } from "react";
 import { WidgetHeader } from "../components/widget-header";
 import { Loader } from "lucide-react";
 import {
-    contactSessionIdAtomFamily,
+  contactSessionIdAtomFamily,
   errorMessageAtom,
   loadingMessageAtom,
   organizationIdAtom,
   screenAtom,
+  widgetSettingsAtom,
 } from "@/modules/atoms/widge-atoms";
-import { useAction, useMutation } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../packages/backend/convex/_generated/api";
-import { set } from "zod/v4-mini";
 
 type InitStep = "org" | "session" | "setting" | "vapi" | "done";
 
-export const WidgetLoadingScreen = ({ orgId }: { orgId: string | null }) => {
+export const WidgetLoadingScreen = ({
+  organizationId,
+}: {
+  organizationId: string | null;
+}) => {
   const [step, setStep] = useState<InitStep>("org");
   const [sessionValid, setSessionValid] = useState<boolean>(false);
 
@@ -26,9 +30,14 @@ export const WidgetLoadingScreen = ({ orgId }: { orgId: string | null }) => {
   const setScreen = useSetAtom(screenAtom);
   const setLoadingMessage = useSetAtom(loadingMessageAtom);
   const setOrganizationId = useSetAtom(organizationIdAtom);
+  const setWidgetSetting = useSetAtom(widgetSettingsAtom);
 
-  const contactSessionId = useAtomValue(contactSessionIdAtomFamily(orgId || ""));
+  const contactSessionId = useAtomValue(
+    contactSessionIdAtomFamily(organizationId || "")
+  );
 
+
+//STEP : 1
   const validateOrganization = useAction(api.public.organizations.validate);
 
   useEffect(() => {
@@ -36,16 +45,16 @@ export const WidgetLoadingScreen = ({ orgId }: { orgId: string | null }) => {
       return;
     }
     setLoadingMessage("Loading organization...");
-    if (!orgId) {
+    if (!organizationId) {
       setErrorMessage("Organization ID is required!");
       setScreen("error");
       return;
     }
     setLoadingMessage("Verifying Organizations...");
-    validateOrganization({ organizationId: orgId })
+    validateOrganization({ organizationId: organizationId })
       .then((res) => {
         if (res.valid) {
-          setOrganizationId(orgId);
+          setOrganizationId(organizationId);
           setStep("session");
         } else {
           setErrorMessage(res.reason || "Invalid Configurations!");
@@ -59,16 +68,18 @@ export const WidgetLoadingScreen = ({ orgId }: { orgId: string | null }) => {
         setScreen("error");
       });
   }, [
-    orgId,
+    organizationId,
     step,
     setErrorMessage,
     setScreen,
     setOrganizationId,
     setStep,
     validateOrganization,
-    setLoadingMessage
+    setLoadingMessage,
   ]);
+  
 
+//STEP : 2 
   const validateSession = useMutation(api.public.contactSessions.validate);
   useEffect(() => {
     if (step !== "session") {
@@ -76,25 +87,23 @@ export const WidgetLoadingScreen = ({ orgId }: { orgId: string | null }) => {
     }
 
     setLoadingMessage("Loading session...");
-    if(!contactSessionId) {
-        setSessionValid(false);
-        setStep("done");
-        return;
+    if (!contactSessionId) {
+      setSessionValid(false);
+      setStep("setting");
+      return;
     }
     setLoadingMessage("Validating session...");
     validateSession({
-        //IF ERROR OCCURS GET INTO 6.12.44 TIMESTAMPS
-        contactSessionId : contactSessionId
+      //IF ERROR OCCURS GET INTO 6.12.44 TIMESTAMPS
+      contactSessionId: contactSessionId,
     })
       .then((res) => {
-        
-          setSessionValid(res.valid);
-          setStep("done");
-        
+        setSessionValid(res.valid);
+        setStep("setting");
       })
       .catch((err) => {
         setSessionValid(false);
-        setStep("done")
+        setStep("setting");
       });
   }, [
     step,
@@ -103,9 +112,29 @@ export const WidgetLoadingScreen = ({ orgId }: { orgId: string | null }) => {
     setSessionValid,
     setStep,
     validateSession,
-    setLoadingMessage
+    setLoadingMessage,
   ]);
 
+
+// STEP : 3
+  const widgetSettings = useQuery(
+    api.public.widgetSettings.getByOrganizationId,
+    organizationId
+      ? {
+          organizationId,
+        }
+      : "skip"
+  );
+  useEffect(() => {
+    if (step !== "setting") {
+      return;
+    }
+    setLoadingMessage("Loading widget settings...");
+    if (widgetSettings !== undefined) {
+      setWidgetSetting(widgetSettings);
+      setStep("done");
+    }
+  }, [step, widgetSettings, setWidgetSetting, setLoadingMessage]);
   useEffect(() => {
     if (step !== "done") {
       return;
