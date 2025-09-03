@@ -16,10 +16,11 @@ export const PricingTable = () => {
 
       <ClerkPricingTable
         forOrganizations
+        newSubscriptionRedirectUrl="/subscription/success"
         appearance={{
           elements: {
             // Container styling
-            pricingTableContainer: "gap-6",
+            pricingTableContainer: "flex flex-row",
             
             // Card styling - make them more attractive
             pricingTableCard: `

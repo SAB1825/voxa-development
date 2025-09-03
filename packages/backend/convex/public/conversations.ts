@@ -2,7 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { SupportAgent } from "../system/ai/agent/supportAgent";
 import { MessageDoc, saveMessage } from "@convex-dev/agent";
-import { components } from "../_generated/api";
+import { components, internal } from "../_generated/api";
 import { paginationOptsValidator } from "convex/server";
 
 export const getMany = query({
@@ -104,6 +104,10 @@ export const create = mutation({
       });
     }
 
+    await ctx.runMutation(internal.system.contactSessions.refresh, {
+      contactSessionId: args.contactSessionId,
+    });
+
     const widgetSettings = await ctx.db
       .query("widgetSettings")
       .withIndex("by_organization_id", (q) =>
@@ -119,7 +123,8 @@ export const create = mutation({
       threadId,
       message: {
         role: "assistant",
-        content: widgetSettings?.greetMessage || "Hello, how can i help you today?",
+        content:
+          widgetSettings?.greetMessage || "Hello, how can i help you today?",
       },
     });
 

@@ -46,8 +46,19 @@ export const create = action({
       });
     }
 
+    await ctx.runMutation(internal.system.contactSessions.refresh, {
+      contactSessionId: args.contactSessionId,
+    });
+
+    const subscription = await ctx.runQuery(
+      internal.system.subscription.getByOrganizationId,
+      {
+        organizationId: conversation.organizationId,
+      }
+    );
     //TODO : CHECK SUBSCRIPTION
-    const shouldTriggerAgent = conversation.status === "unresolved";
+
+    const shouldTriggerAgent = conversation.status === "unresolved" && subscription?.status ==="active";
     if (shouldTriggerAgent) {
       await SupportAgent.generateText(
         ctx,
@@ -57,17 +68,17 @@ export const create = action({
         {
           prompt: args.prompt,
           tools: {
-            resolveConversationTool : resolveConversation,
-            escalateConversationTool : escalateConversation,
-            searchTool : search
+            resolveConversationTool: resolveConversation,
+            escalateConversationTool: escalateConversation,
+            searchTool: search,
           },
         }
       );
-    }else{
+    } else {
       await saveMessage(ctx, components.agent, {
-        threadId : args.threadId,
-        prompt : args.prompt,
-      })
+        threadId: args.threadId,
+        prompt: args.prompt,
+      });
     }
   },
 });

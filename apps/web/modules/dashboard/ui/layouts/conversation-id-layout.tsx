@@ -9,7 +9,7 @@ export const ConversationIdLayout = ({
   return (
      <ResizablePanelGroup className="h-full flex-1" direction="horizontal">
         <ResizablePanel className="h-full" defaultSize={60}>
-            <div className="flex-h-full flex-1 flex-col">
+            <div className="flex flex-1 w-full h-full flex-col">
                 {children}
             </div>
         </ResizablePanel>

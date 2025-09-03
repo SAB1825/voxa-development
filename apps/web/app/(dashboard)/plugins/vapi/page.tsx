@@ -6,7 +6,7 @@ import React from "react";
 const VapiPage = () => {
   return (
     <Protect
-      condition={(has) => has({ plan: "pro" })}
+      condition={(has) => has({ plan: "pro" }) || has({ plan: "free_trial" })}
       fallback={
         <PremiumFeatureOverlay>
           <VapiView />

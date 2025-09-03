@@ -94,6 +94,7 @@ export const DashboardSidebar = () => {
                       "group-data-[collapsible=icon]:hidden! ml-auto text-sidebar-foreground",
                   },
                 }}
+                afterCreateOrganizationUrl="/"
               />
             </SidebarMenuButton>
           </SidebarMenuItem>

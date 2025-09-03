@@ -15,6 +15,7 @@ import { file } from "zod/v4";
 import { ar } from "zod/v4/locales";
 import { Id } from "../_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
+import { internal } from "../_generated/api";
 
 function guessMimeType(filename: string, bytes: ArrayBuffer): string {
   return (
@@ -102,6 +103,20 @@ export const addFile = action({
         code: "UNAUTHORIZED",
         message: "User is not part of an organization",
       });
+    }
+
+    const subscription = await ctx.runQuery(
+      internal.system.subscription.getByOrganizationId,
+      {
+        organizationId: orgId,
+      }
+    );
+
+    if(subscription?.status !== "active") {
+      throw new ConvexError({
+        code :  "BAD_REQUEST",
+        message : "Missing subscription"
+      })
     }
 
     const { filename, bytes, category } = args;

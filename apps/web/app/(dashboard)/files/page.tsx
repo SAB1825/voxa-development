@@ -6,7 +6,7 @@ import { PremiumFeatureOverlay } from '@/modules/billings/ui/components/premium-
 const FilesPage = () => {
   return (
     <Protect
-      condition={(has) => has({ plan : "pro" })}
+      condition={(has) => has({ plan: "pro" }) || has({ plan: "free_trial" })}
       fallback={
         <PremiumFeatureOverlay>
           <FilesView />
