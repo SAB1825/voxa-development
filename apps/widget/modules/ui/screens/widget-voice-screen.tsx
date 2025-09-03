@@ -38,13 +38,13 @@ export const WidgetVoiceScreen = () => {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <MicIcon />
-            <h1 className="text-2xl font-semibold">Chat</h1>
+            <h1 className="text-2xl font-semibold">Voice Call</h1>
           </div>
           
         </div>
       </WidgetHeader>
       {transcript.length > 0 ? (
-        <AIConversation className="h-full flex-1">
+        <AIConversation className="h-full">
           <AIConversationContent>
             {transcript.map((msg, index) => (
               <AIMessage

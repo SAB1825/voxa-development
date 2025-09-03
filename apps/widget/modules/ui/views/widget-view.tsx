@@ -8,6 +8,7 @@ import { WidgetSelectionScreen } from "../screens/widget-selection-scree";
 import { WidgetChatScreen } from "../screens/widget-chat-screen";
 import { WidgetInboxScreen } from "../screens/widget-inbox-screen";
 import { WidgetVoiceScreen } from "../screens/widget-voice-screen";
+import { WidgetContactScreen } from "../screens/widget-contact-screen";
 
 interface WidgetViewProps {
   organizationId: string | null;
@@ -23,10 +24,10 @@ export const WidgetView = ({ organizationId }: WidgetViewProps) => {
     inbox: <WidgetInboxScreen />,
     selection: <WidgetSelectionScreen />,
     chat: <WidgetChatScreen />,
-    contact: <p>TODO : contact</p>,
+    contact: <WidgetContactScreen />,
   }
   return (
-    <main className="min-h-screen min-w-screen flex h-full w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-background shadow-lg">
+    <main className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-background shadow-lg">
       {screenComponent[screen]}
     </main>
   );
