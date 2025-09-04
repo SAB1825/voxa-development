@@ -14,6 +14,9 @@ export const useVapi = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptMessage[]>([]);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const vapiSecrets = useAtomValue(vapiSecretAtom);
   const widgetSettings = useAtomValue(widgetSettingsAtom);
 
@@ -41,6 +44,8 @@ export const useVapi = () => {
       setIsSpeaking(false);
     });
     vapiInstance.on("error", (error) => {
+      setIsError(true);
+      setErrorMessage(error.message);
       console.error("VAPI Error:", error);
       setIsConnected(false);
     });
@@ -78,6 +83,8 @@ export const useVapi = () => {
   }
 
   return {
+    isError,
+    errorMessage,
     isSpeaking,
     isConnected,
     isConnecting,

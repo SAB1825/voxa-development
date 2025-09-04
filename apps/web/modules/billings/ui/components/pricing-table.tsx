@@ -15,7 +15,7 @@ export const PricingTable = () => {
       <div className="w-full">
         <ClerkPricingTable
           forOrganizations
-          newSubscriptionRedirectUrl="/subscription/success"
+          newSubscriptionRedirectUrl="/subscriptions/success"
           appearance={{
             elements: {
               // Container styling - force specific grid layout

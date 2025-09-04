@@ -142,9 +142,6 @@ export const WidgetChatScreen = () => {
             <MessageCircle />
             <h1 className="text-2xl font-semibold">Chat</h1>
           </div>
-          <Button size="icon" variant="transparent">
-            <Menu className="w-5 h-5" />
-          </Button>
         </div>
       </WidgetHeader>
       <AIConversation>
